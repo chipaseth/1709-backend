@@ -1,12 +1,10 @@
 const { Pool } = require('pg');
+require('dotenv').config();
 
-// Get the database URL from environment or use a default
-const databaseUrl = process.env.DATABASE_URL || 'postgresql://postgres:password@localhost:5432/1709coza';
-
-console.log('Database URL:', databaseUrl.replace(/\/\/.*@/, '//***:***@')); // Log without credentials
-
-const pool = new Pool({ 
-  connectionString: databaseUrl
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // Railway / some hosted Postgres require SSL; set if DATABASE_URL indicates it
+  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
 });
 
 // Test the connection
@@ -19,4 +17,8 @@ pool.on('error', (err) => {
   // Don't exit the process, just log the error
 });
 
-module.exports = pool;
+module.exports = {
+  query: (text, params) => pool.query(text, params),
+  pool
+};
+
