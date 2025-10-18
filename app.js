@@ -24,7 +24,7 @@ app.use(cors({
 }));
 
 // ensure OPTIONS preflight returns correct headers quickly
-app.options('*', cors());
+app.options('/*', cors());
 
 // Body parsers
 app.use(express.json({ limit: '1mb' }));
