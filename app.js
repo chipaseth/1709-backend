@@ -23,8 +23,6 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With']
 }));
 
-// ensure OPTIONS preflight returns correct headers quickly
-app.options('/*', cors());
 
 // Body parsers
 app.use(express.json({ limit: '1mb' }));
