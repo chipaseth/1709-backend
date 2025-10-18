@@ -28,6 +28,19 @@ app.use(cors({
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
+// ===== Diagnostic log middleware =====
+app.use((req, res, next) => {
+  console.log('=== Incoming Request ===');
+  console.log('Method:', req.method);
+  console.log('URL:', req.originalUrl);
+  console.log('Content-Type:', req.headers['content-type']);
+  if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
+    console.log('Raw body:', JSON.stringify(req.body, null, 2));
+  }
+  next();
+});
+// ===== End diagnostic middleware =====
+
 // Basic request logging
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} ${req.method} ${req.originalUrl}`);
