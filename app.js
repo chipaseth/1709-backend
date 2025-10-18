@@ -10,10 +10,21 @@ const allowedOrigins = process.env.FRONTEND_URL
   ? [process.env.FRONTEND_URL]
   : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'];
 
+// --- changed code: robust origin check and explicit preflight handling ---
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true
+  origin: (origin, callback) => {
+    // origin is undefined for server-side requests (curl, Postman) — allow those
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    return callback(new Error(`CORS blocked: origin ${origin} not allowed`));
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'Accept', 'X-Requested-With']
 }));
+
+// ensure OPTIONS preflight returns correct headers quickly
+app.options('*', cors());
 
 // Body parsers
 app.use(express.json({ limit: '1mb' }));
