@@ -37,7 +37,7 @@ exports.getAllCustomers = async (req, res) => {
     }
     
     // Get customers with decrypted phone and address - handle decryption errors gracefully
-    let result;
+    // ...existing code...
     try {
       result = await pool.query(`
         SELECT 
@@ -52,7 +52,9 @@ exports.getAllCustomers = async (req, res) => {
             WHEN c.address IS NOT NULL THEN pgp_sym_decrypt(c.address, $1)
             ELSE NULL 
           END as address,
-          COUNT(o.id) as total_orders
+          COUNT(o.id) as total_orders,
+          -- add created_at derived from orders (latest order date)
+          MAX(o.created_at) AS created_at
         FROM customers c
         LEFT JOIN orders o ON c.id = o.customer_id
         GROUP BY c.id, c.name, c.email, c.phone, c.address
@@ -68,13 +70,15 @@ exports.getAllCustomers = async (req, res) => {
           c.email,
           c.phone,
           c.address,
-          COUNT(o.id) as total_orders
+          COUNT(o.id) as total_orders,
+          MAX(o.created_at) AS created_at
         FROM customers c
         LEFT JOIN orders o ON c.id = o.customer_id
         GROUP BY c.id, c.name, c.email, c.phone, c.address
         ORDER BY c.id DESC
       `);
     }
+// ...existing code...
     
     console.log('Customers found:', result.rows.length);
     
