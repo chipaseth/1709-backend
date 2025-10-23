@@ -52,12 +52,11 @@ exports.getAllCustomers = async (req, res) => {
             WHEN c.address IS NOT NULL THEN pgp_sym_decrypt(c.address, $1)
             ELSE NULL 
           END as address,
-          c.created_at,
           COUNT(o.id) as total_orders
         FROM customers c
         LEFT JOIN orders o ON c.id = o.customer_id
-        GROUP BY c.id, c.name, c.email, c.phone, c.address, c.created_at
-        ORDER BY c.created_at DESC
+        GROUP BY c.id, c.name, c.email, c.phone, c.address
+        ORDER BY c.id DESC
       `, [secret]);
     } catch (decryptError) {
       console.log('Decryption failed, trying without decryption:', decryptError.message);
@@ -69,12 +68,11 @@ exports.getAllCustomers = async (req, res) => {
           c.email,
           c.phone,
           c.address,
-          c.created_at,
           COUNT(o.id) as total_orders
         FROM customers c
         LEFT JOIN orders o ON c.id = o.customer_id
-        GROUP BY c.id, c.name, c.email, c.phone, c.address, c.created_at
-        ORDER BY c.created_at DESC
+        GROUP BY c.id, c.name, c.email, c.phone, c.address
+        ORDER BY c.id DESC
       `);
     }
     
